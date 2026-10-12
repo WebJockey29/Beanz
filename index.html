@@ -13,22 +13,30 @@
       <p class="sub">Barista Express dial-in · target 18 g → 36 g in 25–30 s</p>
     </header>
 
+    <section class="card hero">
+      <div id="machine"></div>
+      <p id="machine-caption" class="caption">Add your beans to get a starting grind.</p>
+    </section>
+
     <section class="card">
-      <h2>Bag</h2>
+      <div class="row head">
+        <h2>Beans</h2>
+        <button id="new-beans" type="button">New beans</button>
+      </div>
+      <form id="bag-form" class="bag-form" hidden>
+        <input id="bag-name" placeholder="e.g. Ethiopia Guji" required />
+        <select id="bag-roast" aria-label="Roast">
+          <option value="light">Light roast</option>
+          <option value="medium" selected>Medium roast</option>
+          <option value="dark">Dark roast</option>
+        </select>
+        <button type="submit">Start dialing in</button>
+        <p class="hint wide">New beans start a fresh dial-in. What the app has learned about your grinder and your taste carries over.</p>
+      </form>
       <div class="row">
-        <select id="bag-select" aria-label="Current bag"></select>
+        <select id="bag-select" aria-label="Current beans"></select>
         <button id="delete-bag" class="ghost" type="button">Delete</button>
       </div>
-      <form id="bag-form" class="row">
-        <input id="bag-name" placeholder="New bag, e.g. Ethiopia Guji" required />
-        <select id="bag-roast" aria-label="Roast">
-          <option value="light">Light</option>
-          <option value="medium" selected>Medium</option>
-          <option value="dark">Dark</option>
-        </select>
-        <button type="submit">Add</button>
-      </form>
-      <p id="start-hint" class="hint"></p>
     </section>
 
     <section class="card">
@@ -38,11 +46,11 @@
         <label>Dose (g)<input id="dose" type="number" step="0.1" value="18" required /></label>
         <label>Time (s)<input id="time" type="number" step="0.1" required /></label>
         <label>Yield (g)<input id="yield" type="number" step="0.1" required /></label>
-        <label class="wide">Taste (optional)
+        <label class="wide">Taste (optional, helps it learn your preference)
           <select id="taste">
             <option value="">Not tasted</option>
             <option value="sour">Sour / thin</option>
-            <option value="balanced">Balanced</option>
+            <option value="balanced">Balanced, I like this</option>
             <option value="bitter">Bitter / harsh</option>
           </select>
         </label>
@@ -53,11 +61,18 @@
     <section id="rec" class="card rec" hidden></section>
 
     <section class="card">
-      <h2>Shots in this bag</h2>
-      <table>
-        <thead><tr><th>#</th><th>Grind</th><th>Dose</th><th>Time</th><th>Yield</th><th>@36 g</th><th>Taste</th><th></th></tr></thead>
-        <tbody id="shots"></tbody>
-      </table>
+      <h2>What it has learned</h2>
+      <dl id="learned" class="stats"></dl>
+    </section>
+
+    <section class="card">
+      <h2>Shots with these beans</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>#</th><th>Grind</th><th>Time</th><th>Yield</th><th>@36 g</th><th>Predicted</th><th>Taste</th><th></th></tr></thead>
+          <tbody id="shots"></tbody>
+        </table>
+      </div>
       <p id="empty" class="hint">No shots yet.</p>
     </section>
   </main>

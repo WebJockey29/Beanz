@@ -37,33 +37,48 @@ actually do is this feedback loop, and the app automates it.
 
 ## The algorithm (`src/dialin.js`)
 
+The app learns at two levels.
+
+| Carries over to every new bag (machine & you) | Resets with new beans |
+| --- | --- |
+| Grinder sensitivity: seconds per dial step | How fast these beans run |
+| Your sweet-spot time, learned from shots rated "balanced" | This bag's own sensitivity, which starts at the machine value |
+| Where bags end up on the dial, per roast level, used as the start setting | |
+
 1. **Normalise to target yield.** Shots don't always stop at exactly 36 g. Flow is roughly
    linear once pre-infusion ends (~6 s), so the app estimates the time the shot *would*
    have taken to reach `dose × 2`:
 
    `t36 = delay + (time − delay) × (dose × 2 / yield)`
 
-   For example, 40 g in 19 s works out to ~17.7 s to 36 g.
-
 2. **Linear grind model.** Over the narrow espresso range, `t36(setting) ≈ a − k × setting`.
-   `k` is the seconds each dial step removes.
-   - Prior: `k = 3 s/step`. After two or more finished bags, the app uses the median `k`
-     from your own history instead.
-   - Once a bag has shots at two or more settings, the app fits `k` by least squares. The
-     fit is blended with the prior (weighted like 2 shots) so one channeled shot can't throw
-     it off. Fits outside 0.5–12 s/step are thrown out as noise.
+   `a` belongs to the beans. `k` is the seconds one dial step removes, and it belongs mostly
+   to the grinder.
 
-3. **Anchor on recent shots.** Each shot is moved along the line to the latest setting, then
-   averaged with recency weights (half-life of 2 shots). Newer shots count more, because
-   beans change as they age.
+3. **Learn k from every shot ever logged.** Within each bag, the differences between shots
+   at different settings show `k`, and each bag gets its own `a`, so different beans don't
+   confuse the slope. These are pooled across all bags into a Bayesian estimate:
 
-4. **Solve and round.** The target time is 27.5 s, or ±2 s if the last shot was sour or
-   bitter. The app solves `setting = last + (t_anchor − target) / k`, rounds to a whole dial
-   number, and clamps the result to 1–16. If the answer falls outside that range, the app
-   suggests an inner burr change.
+   `k = (prior_strength × 3 + Σ evidence) / (prior_strength + Σ spread)`
 
-5. **Don't chase noise.** If the last shot was already in the window and tasted fine (or
-   wasn't rated), the app tells you to keep the setting.
+   Every reading adds evidence, so the starting guess of 3 s/step fades away. A new bag
+   starts from the machine `k` and drifts toward what that bag shows. A single shot far
+   off the line (channeling) gets down-weighted.
 
-**New bag start:** the setting your previous bags ended up on (default 5), −1 for light
-roasts and +1 for dark.
+4. **Anchor on recent shots.** Each shot is moved along the line to the latest setting, then
+   averaged with recency weights (half-life of 2 shots), because beans change as they age.
+
+5. **Solve and round.** The target is your learned sweet spot (27.5 s until you rate shots),
+   ±2 s if the last shot was sour or bitter. The app solves
+   `setting = last + (t_anchor − target) / k`, rounds to a whole dial number, and clamps
+   the result to 1–16. If the answer falls outside that range, it suggests an inner burr
+   change. If the last shot was already in the window and tasted fine, it tells you to keep
+   the setting.
+
+6. **Show that it's improving.** For every shot after the first, the app records what it
+   would have predicted *before* seeing that shot. The shots table and the "What it has
+   learned" panel show those prediction errors, so you can watch them shrink.
+
+**New beans:** pressing *New beans* starts a fresh dial-in. The first setting comes from
+where your previous bags of that roast ended up (default 5, −1 for light roasts, +1 for
+dark). Deleting a bag also removes what the app learned from it.

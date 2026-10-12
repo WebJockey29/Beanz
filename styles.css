@@ -74,3 +74,58 @@ table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
 th, td { text-align: left; padding: 6px 4px; border-bottom: 1px solid var(--border); }
 th { color: var(--muted); font-weight: 500; }
 td button { padding: 2px 8px; background: transparent; color: var(--muted); }
+
+.head { align-items: center; }
+.head h2 { margin: 0; }
+.head > :first-child { flex: 1; }
+.bag-form { display: grid; grid-template-columns: 1fr auto; gap: 8px; margin-bottom: 12px; }
+.bag-form button { grid-column: 1 / -1; }
+.bag-form[hidden] { display: none; }
+
+.stats { display: grid; grid-template-columns: auto 1fr; gap: 6px 12px; margin: 0; font-size: 0.9rem; }
+.stats dt { color: var(--muted); }
+.stats dd { margin: 0; }
+
+.table-wrap { overflow-x: auto; }
+.err { color: var(--muted); font-size: 0.8em; }
+
+/* Machine illustration */
+.hero { padding: 12px 16px; text-align: center; }
+.machine { width: 100%; max-width: 380px; height: auto; display: block; margin: 0 auto; }
+.caption { margin: 8px 0 0; font-weight: 600; color: var(--accent); }
+
+.machine .needle {
+  transform-box: view-box;
+  transform-origin: 180px 116px;
+  transform: rotate(-135deg);
+  transition: transform 0.6s ease;
+}
+.machine .stream line { stroke: #4a2a15; stroke-width: 2.2; stroke-linecap: round; opacity: 0; }
+.machine .coffee, .machine .crema { transform-box: view-box; transform-origin: 180px 258px; }
+.machine .power-led { filter: drop-shadow(0 0 2px #f0a33a); }
+
+.machine.pouring .needle { animation: needle 3.2s ease-in-out; }
+.machine.pouring .stream line { animation: stream 3.2s ease-in-out; stroke-dasharray: 4 3; }
+.machine.pouring .coffee, .machine.pouring .crema { animation: fill 3.2s ease-in-out; }
+
+@keyframes needle {
+  0% { transform: rotate(-135deg); }
+  20% { transform: rotate(70deg); }
+  30%, 70% { transform: rotate(80deg); }
+  50% { transform: rotate(74deg); }
+  100% { transform: rotate(-135deg); }
+}
+@keyframes stream {
+  0%, 15% { opacity: 0; stroke-dashoffset: 0; }
+  25%, 80% { opacity: 1; }
+  100% { opacity: 0; stroke-dashoffset: -60; }
+}
+@keyframes fill {
+  0%, 20% { transform: scaleY(0); }
+  85%, 100% { transform: scaleY(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .machine.pouring .needle, .machine.pouring .stream line,
+  .machine.pouring .coffee, .machine.pouring .crema { animation: none; }
+}
