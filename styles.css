@@ -1,0 +1,76 @@
+:root {
+  --bg: #f6f1ea;
+  --card: #fffdf9;
+  --text: #2b2018;
+  --muted: #7a6a5c;
+  --accent: #7b4a24;
+  --border: #e4d8ca;
+  --ok: #2f7a3e;
+  --warn: #b5651d;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1b1612;
+    --card: #251e18;
+    --text: #f1e7dc;
+    --muted: #b3a291;
+    --accent: #d39a62;
+    --border: #3a2f26;
+    --ok: #6cc17c;
+    --warn: #e09a55;
+  }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 16px/1.45 system-ui, -apple-system, Segoe UI, sans-serif;
+}
+
+main { max-width: 640px; margin: 0 auto; padding: 16px; }
+h1 { margin: 0; color: var(--accent); }
+h2 { margin: 0 0 12px; font-size: 1.05rem; }
+.sub, .hint { color: var(--muted); margin: 4px 0 0; font-size: 0.9rem; }
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  margin-top: 16px;
+}
+
+.row { display: flex; gap: 8px; margin-bottom: 8px; }
+.row > :first-child { flex: 1; }
+
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.grid input, .grid select { width: 100%; }
+.grid label { min-width: 0; display: flex; flex-direction: column; gap: 4px; font-size: 0.85rem; color: var(--muted); }
+.wide { grid-column: 1 / -1; }
+
+input, select, button {
+  min-width: 0;
+  font: inherit;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+}
+
+button { background: var(--accent); color: #fff; border: none; cursor: pointer; }
+button.ghost { background: transparent; color: var(--muted); border: 1px solid var(--border); }
+
+.rec .big { font-size: 2.2rem; font-weight: 700; color: var(--accent); margin: 4px 0; }
+.rec.dialed .big { color: var(--ok); }
+.rec ul { padding-left: 18px; margin: 8px 0 0; }
+.rec li { color: var(--warn); }
+
+table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+th, td { text-align: left; padding: 6px 4px; border-bottom: 1px solid var(--border); }
+th { color: var(--muted); font-weight: 500; }
+td button { padding: 2px 8px; background: transparent; color: var(--muted); }
