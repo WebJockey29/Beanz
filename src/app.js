@@ -42,6 +42,7 @@ function render() {
     : '<option value="">No beans yet</option>';
   sel.value = state.currentId ?? '';
   $('bag-form').hidden = state.bags.length > 0 && !showBagForm;
+  $('example-row').hidden = state.bags.length > 0;
 
   const bag = currentBag();
   $('rec').hidden = true;
@@ -156,15 +157,52 @@ $('bag-form').addEventListener('submit', (e) => {
   render();
 });
 
+// Sample readings so the app can be tried before pulling real shots.
+$('load-example').addEventListener('click', () => {
+  const bag = {
+    id: crypto.randomUUID(),
+    name: 'Example: Brazil Cerrado',
+    roast: 'medium',
+    created: new Date().toISOString(),
+    shots: [
+      { setting: 6, dose: 18, time: 19, yield: 40, taste: 'sour' },
+      { setting: 3, dose: 18, time: 34, yield: 36, taste: 'bitter' },
+      { setting: 4, dose: 18, time: 29, yield: 37 },
+    ],
+  };
+  state.bags.push(bag);
+  state.currentId = bag.id;
+  save();
+  machine.pour();
+  render();
+});
+
 $('bag-select').addEventListener('change', (e) => {
   state.currentId = e.target.value;
   save();
   render();
 });
 
+// Two-tap delete: browser confirm() dialogs are blocked in some hosts.
+let deleteArmed = null;
 $('delete-bag').addEventListener('click', () => {
   const bag = currentBag();
-  if (!bag || !confirm(`Delete "${bag.name}" and its shots? The app will also forget what it learned from them.`)) return;
+  const btn = $('delete-bag');
+  if (!bag) return;
+  if (deleteArmed !== bag.id) {
+    deleteArmed = bag.id;
+    btn.textContent = 'Tap to confirm';
+    btn.classList.add('danger');
+    setTimeout(() => {
+      deleteArmed = null;
+      btn.textContent = 'Delete';
+      btn.classList.remove('danger');
+    }, 3000);
+    return;
+  }
+  deleteArmed = null;
+  btn.textContent = 'Delete';
+  btn.classList.remove('danger');
   state.bags = state.bags.filter((b) => b !== bag);
   state.currentId = state.bags.at(-1)?.id ?? null;
   save();
